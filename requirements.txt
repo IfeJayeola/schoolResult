@@ -4,7 +4,7 @@ cffi==2.0.0
 charset-normalizer==3.4.3
 cryptography==46.0.2
 defusedxml==0.7.1
-deta==1.2.0
+#deta==1.2.0
 Django==5.2.6
 django-filter==25.2
 django-oauth-toolkit==3.1.0
