@@ -1,5 +1,5 @@
-from rest_framework import serializers
-from .models import Student, MyUser
+from rest_framework import serializers # type: ignore
+from .models import Student, MyUser, Assessment, TermReport
 
 class StudentSerializers(serializers.ModelSerializer):
     class Meta:
@@ -18,3 +18,21 @@ class UserSerializer(serializers.ModelSerializer):
             **validated_data
         )
         return user
+class AssessmentSerializer(serializers.ModelSerializer):
+    subject_name = serializers.CharField(source='subject.name', read_only=True)
+
+    class Meta:
+        model = Assessment
+        fields = ['subject_name', 'ca1_score', 'ca2_score', 
+                  'ca3_score', 'exam_score', 'total_score', 'grade', 'remark']
+
+class TermReportSerializer(serializers.ModelSerializer):
+    student_name = serializers.CharField(source='student.get_full_name', read_only=True)
+
+    class Meta:
+        model = TermReport
+        fields = ['report_id', 'student_name', 'session', 'term','average_score', 'position_in_class', 'assessments',                  'class_teacher_comment', 'principal_comment']
+    
+    def get_assessments(self, obj):
+        assessments = obj.get_all_assessments()
+        return AssessmentSerializer(assessments, many=True).data

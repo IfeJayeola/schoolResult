@@ -163,10 +163,7 @@ class Student(models.Model):
 
 
 class Assessment(models.Model):
-    #subject
-    #session
-    #student
-    #class 
+   
     assessment_id = models.AutoField(primary_key=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='assessments')
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='assessments')
