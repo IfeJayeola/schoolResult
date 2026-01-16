@@ -1,7 +1,7 @@
 import uuid
-from django.db import models
-from django.contrib.auth.models import AbstractUser BaseUserManager
-from django.core.validators import MinValueValidator, MaxValueValidator
+from django.db import models # type: ignore # type: ignore
+from django.contrib.auth.models import AbstractUser, BaseUserManager # type: ignore 
+from django.core.validators import MinValueValidator, MaxValueValidator # type: ignore
 
 
 
@@ -258,3 +258,41 @@ class TermReport(models.Model):
     session = models.ForeignKey(AcademicSession, on_delete=models.CASCADE, related_name='reports')
     term = models.CharField(max_length=10, choices=Term.choices)
     classroom = models.ForeignKey(ClassRoom, on_delete=models.CASCADE, related_name='reports')
+    total_subjects = models.IntegerField(default=0)
+    average_score = models.DecimalField(max_digits=5, decimal_places=2, default=0.00)
+    position_in_class = models.IntegerField(null=True, blank=True)
+    class_teacher_comment = models.TextField(blank=True)
+    principal_comment = models.TextField(blank=True)
+
+    class Meta:
+        db_table = 'term_reports'
+        unique_together = ['student', 'session', 'term']
+
+    def __str__(self):
+        return f"{self.student} - {self.get_term_display()} Report ({self.session})"
+
+    def calculate_summary(self):
+        assessments = Assessment.objects.filter(
+            student=self.student,
+            session=self.session,
+            term=self.term
+        )
+        
+        self.total_subjects = assessments.count()
+        if self.total_subjects > 0:
+            total = sum(a.total_score for a in assessments)
+            self.average_score = total / self.total_subjects
+        
+        self.save()
+
+    def calculate_position(self):
+        reports = TermReport.objects.filter(
+            classroom=self.classroom,
+            session=self.session,
+            term=self.term
+        ).order_by('-average_score')
+        
+        for position, report in enumerate(reports, start=1):
+            report.position_in_class = position
+            report.save()
+
