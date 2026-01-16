@@ -70,10 +70,10 @@ class MyUser(AbstractUser):
     
 class AcademicSession(models.Model):
     sesson_id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length = 20, null = False)
-    start_date = models.DateField()
-    end_date = models.DateField()
-    is_current = models.BooleanField(default=False)
+    name = models.CharField(max_length = 20,null = False, help_text="Academic session name (e.g., '2024/2025')")
+    start_date = models.DateField(help_text="Session start date (YYYY-MM-DD)")
+    end_date = models.DateField(help_text="Session end date (YYYY-MM-DD)")
+    is_current = models.BooleanField(default=False, help_text="Is this the current active session?")
 
     class Meta:
         db_table = 'academic_sessions'
@@ -83,8 +83,10 @@ class AcademicSession(models.Model):
         return self.name
     
 
+    
+
 class ClassRoom(models.Model):
-    class_id =  models.AutoField(primary_keyy = True)
+    class_id =  models.AutoField(primary_key = True)
     class_level = models.CharField(max_length=3, choices=StudentClass.choices)
     session = models.ForeignKey(
         AcademicSession,
@@ -109,6 +111,13 @@ class ClassRoom(models.Model):
 class Subject(models.Model):
     subject_id = models.AutoField(primary_key = True)
     name = models.CharField(max_length=100, unique=True)
+    applicable_classes = models.ForeignKey(
+        ClassRoom,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='subjects_inclasses'
+    )
 
     class Meta:
         db_table = 'subjects'
