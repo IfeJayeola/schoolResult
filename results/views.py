@@ -27,13 +27,13 @@ class AssessmentViewSet(viewsets.ModelViewSet):
 
 class TermReportViewSet(viewsets.ModelViewSet):
         queryset = TermReport.objects.all()  #type: ignore
-        http_method_names = ['get', 'post', 'patch', 'delete']
+        http_method_names = ['get', 'patch', 'delete']
         serializer_class = TermReportSerializer
  
 
 class AcademicSessionViewSet(viewsets.ModelViewSet):
         queryset = AcademicSession.objects.all()  #type: ignore
-        http_method_names = ['get', 'post', 'patch', 'delete']
+        http_method_names = ['get', 'post']
         serializer_class = AcademicSessionSerializer
  
 

@@ -120,7 +120,7 @@ class Subject(models.Model):
     )
 
     class Meta:
-        db_table = 'subjects'
+        db_table = 'subjects' 
         ordering = ['name']
 
     def __str__(self):
@@ -283,7 +283,7 @@ class TermReport(models.Model):
             session=self.session,
             term=self.term
         )
-        
+        print('calculate_position')
         self.total_subjects = assessments.count()
         if self.total_subjects > 0:
             total = sum(a.total_score for a in assessments)
@@ -291,12 +291,21 @@ class TermReport(models.Model):
         
         self.save()
 
+
+    def get_all_assessments(self):
+         return Assessment.objects.filter(
+            student=self.student,
+            session=self.session,
+            term=self.term
+        ).select_related('subject').order_by('subject__name')
+    
     def calculate_position(self):
         reports = TermReport.objects.filter(
             classroom=self.classroom,
             session=self.session,
             term=self.term
         ).order_by('-average_score')
+        print('alculate_position')
         
         for position, report in enumerate(reports, start=1):
             report.position_in_class = position
